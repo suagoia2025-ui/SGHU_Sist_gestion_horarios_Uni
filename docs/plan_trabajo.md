@@ -169,8 +169,8 @@ sghu/
 ### 2.1 Script Simulador de Odoo
 **Archivo:** `scripts/simulate_odoo.py`
 
-- [ ] Generar 5 programas académicos realistas
-  - Ej: Ingeniería de Sistemas, Medicina, Derecho, Administración, Psicología
+- [ ] Generar 5 programas académicos
+  - Técnico Superior en Logística Internacional, Técnico Superior en Mecánica de Equipo Pesado, Técnico Superior en Soldadura Subacuática, Técnico Superior en Asistencia de Tripulación Aérea y Técnico Superior en Topografía.
 - [ ] Generar 100+ asignaturas coherentes
   - Distribuidas por programa
   - Con créditos realistas (1-4 créditos)

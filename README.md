@@ -99,12 +99,31 @@ alembic upgrade head
 python scripts/populate_db.py
 ```
 
-### 7. Iniciar servidor
+### 7. Iniciar servidor FastAPI
 ```bash
-uvicorn app.main:app --reload
+# Desde el directorio backend/
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 8. Iniciar workers (en otra terminal)
+El servidor estará disponible en:
+- **API**: http://localhost:8000
+- **Documentación Swagger**: http://localhost:8000/docs
+- **Documentación ReDoc**: http://localhost:8000/redoc
+- **Health Check**: http://localhost:8000/health
+- **DB Health Check**: http://localhost:8000/api/v1/health/db
+
+### 8. Probar la API
+```bash
+# Ejecutar script de pruebas
+python scripts/test_api.py
+
+# O probar manualmente con curl
+curl http://localhost:8000/health
+curl http://localhost:8000/api/v1/students?limit=5
+curl http://localhost:8000/api/v1/programs
+```
+
+### 9. Iniciar workers (en otra terminal - FASE 7)
 ```bash
 celery -A app.core.celery_app worker --loglevel=info
 ```

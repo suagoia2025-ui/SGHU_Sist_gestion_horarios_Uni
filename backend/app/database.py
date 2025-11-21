@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from app.config import settings
@@ -16,4 +16,12 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def create_schemas():
+    """Crea los esquemas 'source' y 'sghu' si no existen"""
+    with engine.connect() as conn:
+        conn.execute(text("CREATE SCHEMA IF NOT EXISTS source"))
+        conn.execute(text("CREATE SCHEMA IF NOT EXISTS sghu"))
+        conn.commit()
 

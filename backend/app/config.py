@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/api/v1"
     PROJECT_NAME: str = "SGHU - Sistema de Gestión de Horarios Universitarios"
     VERSION: str = "0.1.0"
+    SECRET_KEY: str = "your-secret-key-here-change-in-production"
     
     # CORS
     CORS_ORIGINS: List[str] = [
