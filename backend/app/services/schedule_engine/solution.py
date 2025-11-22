@@ -26,6 +26,7 @@ class ScheduleSolution:
     processing_time: float  # Tiempo en segundos
     conflicts: List[str]  # Lista de conflictos si no es viable
     solver_status: str  # OPTIMAL, FEASIBLE, INFEASIBLE, etc.
+    quality_score: Optional[float] = None  # Score de calidad (fitness) - menor es mejor
     
     def __post_init__(self):
         """Validar datos después de inicialización"""
@@ -51,6 +52,7 @@ class ScheduleSolution:
             ],
             "processing_time": self.processing_time,
             "conflicts": self.conflicts,
-            "solver_status": self.solver_status
+            "solver_status": self.solver_status,
+            "quality_score": self.quality_score
         }
 

@@ -192,7 +192,8 @@ class ConstraintScheduleSolver:
                 unassigned_subjects=unassigned_subjects,
                 processing_time=processing_time,
                 conflicts=[],
-                solver_status=status_str
+                solver_status=status_str,
+                quality_score=None  # Se calculará después si es necesario
             )
         else:
             # No se encontró solución
@@ -207,7 +208,8 @@ class ConstraintScheduleSolver:
                 unassigned_subjects=[],
                 processing_time=processing_time,
                 conflicts=conflicts,
-                solver_status=status_str
+                solver_status=status_str,
+                quality_score=None
             )
     
     def _add_objective(self):

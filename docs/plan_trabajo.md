@@ -13,6 +13,8 @@
 
 **Duración estimada:** 31 días (aproximadamente 6-7 semanas)
 
+**Estado Actual:** FASE 0-6 completadas ✅ (FASE 7-9 pendientes)
+
 ---
 
 ## 📋 FASE 0: Setup del Proyecto
@@ -1063,7 +1065,7 @@ def generate_schedule(
 
 ---
 
-## 📋 FASE 6: Motor de Horarios - Parte 2 (Optimización)
+## 📋 FASE 6: Motor de Horarios - Parte 2 (Optimización) ✅ COMPLETADA
 **Duración:** Días 18-22  
 **Objetivo:** Implementar optimización de horarios con Algoritmos Genéticos para mejorar calidad
 
@@ -1204,7 +1206,7 @@ Representación: Lista de secciones asignadas
 Ejemplo:
 individuo = [section_12, section_45, section_78, section_23, section_90]
             ↓
-Significa: cursar la sección 12 de Cálculo I, sección 45 de Física, etc.
+Significa: cursar la sección 12 de Equipos de Buceo y Sistemas de Soporte de Vida, sección 45 de Matemáticas Aplicadas a la Logística, etc.
 """
 
 def create_individual(student: Student, available_sections: List[Section]) -> List[int]:

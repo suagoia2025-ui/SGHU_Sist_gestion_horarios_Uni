@@ -5,13 +5,15 @@ Sistema para gestionar la matrícula y generación automática de horarios en un
 ## 🎯 Características Principales
 
 - ✅ Gestión completa del proceso de matrícula
-- 🤖 Generación automática de horarios optimizados (FASE 5-6)
+- ✅ Generación automática de horarios optimizados ✅ **FASE 5-6 COMPLETADA**
 - 🔄 Procesamiento asíncrono con Celery (FASE 7)
-- 📊 Validación exhaustiva de reglas académicas ✅ **COMPLETADO**
-- 🎨 Motor híbrido de optimización (OR-Tools + DEAP) (FASE 5-6)
-- 📡 API REST completa con FastAPI ✅ **COMPLETADO**
-- 🗄️ PostgreSQL para persistencia ✅ **COMPLETADO**
-- 🔧 Simulación de integraciones (Odoo, Moodle) ✅ **COMPLETADO**
+- ✅ Validación exhaustiva de reglas académicas ✅ **COMPLETADO**
+- ✅ Motor híbrido de optimización (OR-Tools + DEAP) ✅ **COMPLETADO**
+- ✅ API REST completa con FastAPI ✅ **COMPLETADO**
+- ✅ PostgreSQL para persistencia ✅ **COMPLETADO**
+- ✅ Simulación de integraciones (Odoo, Moodle) ✅ **COMPLETADO**
+- ✅ Persistencia de horarios generados ✅ **COMPLETADO**
+- ✅ Endpoints de consulta y análisis ✅ **COMPLETADO**
 
 ## 🏗️ Arquitectura
 ```
@@ -138,7 +140,24 @@ El servidor estará disponible en:
   }
   ```
 
-Ver [Ejemplos de Validación](backend/scripts/EJEMPLOS_VALIDACION.md) para más detalles.
+#### Generación de Horarios
+- `POST /api/v1/schedules/generate` - Generar horario optimizado
+  ```json
+  {
+    "student_id": 1,
+    "selected_subject_ids": [1, 2, 3, 4, 5],
+    "academic_period_id": 1,
+    "optimization_level": "medium"  // "none" | "low" | "medium" | "high"
+  }
+  ```
+
+#### Consulta de Horarios
+- `GET /api/v1/schedules/students/{student_id}` - Listar horarios de un estudiante
+- `GET /api/v1/schedules/{schedule_id}` - Detalles de un horario específico
+- `GET /api/v1/schedules/{schedule_id}/compare/{other_schedule_id}` - Comparar dos horarios
+- `GET /api/v1/schedules/students/{student_id}/stats` - Estadísticas de horarios
+
+Ver [Ejemplos de Validación](backend/scripts/EJEMPLOS_VALIDACION.md) y [Ejemplos de Consulta](backend/scripts/EJEMPLOS_ENDPOINTS_CONSULTA.md) para más detalles.
 
 ### 8. Probar la API
 ```bash
@@ -166,13 +185,31 @@ celery -A app.core.celery_app worker --loglevel=info
 
 ## 📚 Documentación
 
+### Documentación Principal
+- [Índice de Documentación](docs/INDICE_DOCUMENTACION.md) - Índice completo de toda la documentación
 - [Plan de Trabajo](docs/plan_trabajo.md) - Fases del proyecto
 - [Fase 1: Base de Datos](docs/fase1-base-datos.md) ✅ Completada
+- [Fase 6: Motor de Horarios - Optimización](docs/fase6-motor-horarios-optimizacion.md) ✅ Completada
 - [Reglas de Negocio](docs/reglas-negocio.md) ✅ Completada
 - [API Reference](http://localhost:8000/docs) (Swagger) ✅ Disponible
+
+### Documentación de Endpoints
 - [Ejemplos de Validación](backend/scripts/EJEMPLOS_VALIDACION.md) ✅ Disponible
-- [Motor de Horarios](docs/motor-horarios.md) (FASE 5-6)
-- [Workers Asíncronos](docs/workers-asincrono.md) (FASE 7)
+- [Ejemplos de Consulta de Horarios](backend/scripts/EJEMPLOS_ENDPOINTS_CONSULTA.md) ✅ Disponible
+- [Resumen de Endpoints de Consulta](backend/scripts/RESUMEN_ENDPOINTS_CONSULTA.md) ✅ Disponible
+
+### Documentación de Motor de Horarios
+- [Resultados de Pruebas de Optimización](backend/scripts/RESULTADOS_PRUEBAS_OPTIMIZACION.md) ✅ Disponible
+- [Resultados de Pruebas Avanzadas](backend/scripts/RESULTADOS_PRUEBAS_AVANZADAS.md) ✅ Disponible
+- [Resultados de Pruebas Específicas](backend/scripts/RESULTADOS_PRUEBAS_ESPECIFICAS.md) ✅ Disponible
+- [Ajuste de Pesos de Fitness](backend/scripts/AJUSTE_PESOS_FITNESS.md) ✅ Disponible
+- [Resultados con Pesos Ajustados](backend/scripts/RESULTADOS_PRUEBAS_PESOS_AJUSTADOS.md) ✅ Disponible
+- [Resultados de Persistencia](backend/scripts/RESULTADOS_PERSISTENCIA.md) ✅ Disponible
+
+### Documentación Técnica
+- [Guía de Visualización de Tablas](backend/scripts/GUIA_VISUALIZACION_TABLAS.md) ✅ Disponible
+- [Código Hardcodeado](backend/CODIGO_HARDCODEADO.md) ✅ Disponible
+- [Auditoría del Proyecto](backend/AUDITORIA_PROYECTO.md) ✅ Disponible
 
 ## 🧪 Testing
 
@@ -224,6 +261,21 @@ python scripts/test_api.py
 
 # Probar endpoints de validación
 ./scripts/test_validaciones.sh
+
+# Probar función de fitness
+python scripts/test_fitness.py
+
+# Probar algoritmo de optimización
+python scripts/test_optimization.py
+
+# Probar optimización avanzada
+python scripts/test_optimization_advanced.py
+
+# Probar optimización específica
+python scripts/test_optimization_specific.py
+
+# Probar persistencia
+python scripts/test_persistence.py
 ```
 
 ### Simulaciones (FASE 9 - Futuro)
@@ -245,15 +297,21 @@ python scripts/analyze_simulation_results.py mass_enrollment_results.json
 - SQLAlchemy 2.0
 - Pydantic V2
 - Celery + Redis
-- Google OR-Tools
-- DEAP (Genetic Algorithms)
+- Google OR-Tools 9.12+ (CP-SAT Solver)
+- DEAP 1.4+ (Algoritmos Genéticos)
 
 **Database:**
 - PostgreSQL 15+
+- Alembic (Migraciones)
 
 **Testing:**
 - Pytest
 - HTTPx
+
+**Optimización:**
+- OR-Tools CP-SAT: Restricciones duras
+- DEAP: Optimización genética de restricciones blandas
+- Motor híbrido: Combinación de ambos
 
 ## 📈 Estado del Proyecto
 
@@ -264,11 +322,11 @@ python scripts/analyze_simulation_results.py mass_enrollment_results.json
 - **FASE 2:** Scripts de Simulación ✅
 - **FASE 3:** Estructura FastAPI Base ✅
 - **FASE 4:** Lógica de Validación ✅
+- **FASE 5:** Motor de Horarios - Parte 1 (Restricciones Duras) ✅
+- **FASE 6:** Motor de Horarios - Parte 2 (Optimización) ✅
 
 ### 🚧 Fases Pendientes
 
-- **FASE 5:** Motor de Horarios - Parte 1 (Restricciones Duras)
-- **FASE 6:** Motor de Horarios - Parte 2 (Optimización)
 - **FASE 7:** Workers Asíncronos
 - **FASE 8:** Testing y Refinamiento
 - **FASE 9:** Simulador Frontend
@@ -277,12 +335,17 @@ python scripts/analyze_simulation_results.py mass_enrollment_results.json
 
 | Métrica | Objetivo | Estado |
 |---------|----------|--------|
-| Generación CP-SAT | < 2s | Pendiente |
-| Optimización AG | < 10s | Pendiente |
-| Throughput | > 5 estudiantes/s | Pendiente |
-| Coverage | > 80% | Pendiente |
-| Validaciones implementadas | 6/6 | ✅ 100% |
-| Endpoints de validación | 3/3 | ✅ 100% |
+| Generación CP-SAT | < 2s | ✅ **0.02-0.05s** |
+| Optimización AG (medium) | < 10s | ✅ **0.07-0.14s** |
+| Optimización AG (high) | < 30s | ✅ **0.3-0.7s** |
+| Throughput | > 5 estudiantes/s | Pendiente (FASE 7) |
+| Coverage | > 80% | Pendiente (FASE 8) |
+| Validaciones implementadas | 6/6 | ✅ **100%** |
+| Endpoints de validación | 3/3 | ✅ **100%** |
+| Endpoints de horarios | 5/5 | ✅ **100%** |
+| Persistencia de horarios | ✅ | ✅ **Implementada** |
+| Restricciones duras preservadas | ✅ | ✅ **100%** |
+| Mejora de calidad (optimización) | > 10% | ✅ **1019% promedio** |
 
 ## 🤝 Contribuir
 

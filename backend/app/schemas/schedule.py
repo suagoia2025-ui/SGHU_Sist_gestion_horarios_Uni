@@ -3,7 +3,7 @@ Schemas Pydantic para horarios y secciones
 """
 from pydantic import BaseModel
 from datetime import date, time, datetime
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 
 class AcademicPeriodRead(BaseModel):
@@ -125,6 +125,7 @@ class ScheduleGenerationRequest(BaseModel):
     student_id: int
     selected_subject_ids: List[int]
     academic_period_id: Optional[int] = None
+    optimization_level: Optional[str] = "none"  # "none" | "low" | "medium" | "high"
 
 
 class UnassignedSubjectInfo(BaseModel):
@@ -146,6 +147,77 @@ class ScheduleSolutionResponse(BaseModel):
     processing_time: float
     conflicts: List[str]
     solver_status: str
+    quality_score: Optional[float] = None  # Score de calidad (menor = mejor)
+
+    class Config:
+        from_attributes = True
+
+
+class ScheduleSlotDetailRead(BaseModel):
+    """Detalle de un slot de horario con información de la sección"""
+    id: int
+    schedule_id: int
+    section_id: int
+    day_of_week: int
+    start_time: time
+    end_time: time
+    section_number: Optional[int] = None
+    subject_code: Optional[str] = None
+    subject_name: Optional[str] = None
+    professor_name: Optional[str] = None
+    classroom_code: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class GeneratedScheduleRead(BaseModel):
+    """Horario generado guardado en la base de datos"""
+    id: int
+    enrollment_id: int
+    student_id: Optional[int] = None
+    generation_method: str
+    quality_score: Optional[float] = None
+    processing_time: Optional[float] = None
+    status: str
+    created_at: datetime
+    schedule_slots: List[ScheduleSlotDetailRead] = []
+
+    class Config:
+        from_attributes = True
+
+
+class ScheduleListResponse(BaseModel):
+    """Lista de horarios de un estudiante"""
+    student_id: int
+    total_schedules: int
+    schedules: List[GeneratedScheduleRead]
+
+    class Config:
+        from_attributes = True
+
+
+class ScheduleComparisonResponse(BaseModel):
+    """Comparación entre dos horarios"""
+    schedule_1: GeneratedScheduleRead
+    schedule_2: GeneratedScheduleRead
+    comparison: Dict[str, Any]
+
+    class Config:
+        from_attributes = True
+
+
+class ScheduleStatsResponse(BaseModel):
+    """Estadísticas de horarios de un estudiante"""
+    student_id: int
+    total_schedules: int
+    completed_schedules: int
+    failed_schedules: int
+    average_quality_score: Optional[float] = None
+    best_quality_score: Optional[float] = None
+    worst_quality_score: Optional[float] = None
+    average_processing_time: Optional[float] = None
+    generation_methods: Dict[str, int] = {}
 
     class Config:
         from_attributes = True
