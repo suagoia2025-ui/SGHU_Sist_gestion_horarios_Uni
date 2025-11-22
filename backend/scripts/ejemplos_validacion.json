@@ -1,0 +1,237 @@
+{
+  "endpoints": {
+    "POST /api/v1/enrollment/validate": {
+      "description": "Valida una solicitud de matrícula sin persistirla",
+      "url": "http://localhost:8000/api/v1/enrollment/validate",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "examples": [
+        {
+          "name": "Ejemplo 1: Matrícula válida (5 asignaturas)",
+          "request": {
+            "student_id": 1,
+            "academic_period_id": 1,
+            "section_ids": [1, 2, 3, 4, 5]
+          },
+          "expected_response": {
+            "is_valid": true,
+            "can_proceed": true,
+            "validations": [
+              {
+                "validation_type": "financial_status",
+                "is_valid": true,
+                "message": "Estado financiero válido"
+              }
+            ],
+            "error_summary": null
+          }
+        },
+        {
+          "name": "Ejemplo 2: Estudiante con deuda (bloqueado)",
+          "request": {
+            "student_id": 2,
+            "academic_period_id": 1,
+            "section_ids": [1, 2, 3]
+          },
+          "expected_response": {
+            "is_valid": false,
+            "can_proceed": false,
+            "validations": [
+              {
+                "validation_type": "financial_status",
+                "is_valid": false,
+                "message": "Tienes una deuda pendiente de $X.XX"
+              }
+            ],
+            "error_summary": "Bloqueo financiero: Tienes una deuda pendiente..."
+          }
+        },
+        {
+          "name": "Ejemplo 3: Excede límite de créditos",
+          "request": {
+            "student_id": 1,
+            "academic_period_id": 1,
+            "section_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+          },
+          "expected_response": {
+            "is_valid": false,
+            "can_proceed": false,
+            "validations": [
+              {
+                "validation_type": "credit_limit",
+                "is_valid": false,
+                "message": "Excedes el límite máximo de créditos..."
+              }
+            ]
+          }
+        },
+        {
+          "name": "Ejemplo 4: Con choque de horario",
+          "request": {
+            "student_id": 1,
+            "academic_period_id": 1,
+            "section_ids": [1, 2]
+          },
+          "note": "Asegúrate de que las secciones 1 y 2 tengan horarios que choquen",
+          "expected_response": {
+            "is_valid": false,
+            "can_proceed": false,
+            "validations": [
+              {
+                "validation_type": "schedule_conflicts",
+                "is_valid": false,
+                "message": "Conflicto de horario detectado..."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "GET /api/v1/students/{student_id}/eligible-subjects": {
+      "description": "Obtiene asignaturas que el estudiante puede cursar",
+      "url": "http://localhost:8000/api/v1/students/{student_id}/eligible-subjects",
+      "method": "GET",
+      "query_parameters": {
+        "academic_period_id": "Opcional. Si no se proporciona, usa el período activo"
+      },
+      "examples": [
+        {
+          "name": "Ejemplo 1: Sin período específico (usa activo)",
+          "url": "http://localhost:8000/api/v1/students/1/eligible-subjects",
+          "curl": "curl http://localhost:8000/api/v1/students/1/eligible-subjects"
+        },
+        {
+          "name": "Ejemplo 2: Con período específico",
+          "url": "http://localhost:8000/api/v1/students/1/eligible-subjects?academic_period_id=1",
+          "curl": "curl 'http://localhost:8000/api/v1/students/1/eligible-subjects?academic_period_id=1'"
+        },
+        {
+          "name": "Ejemplo de respuesta",
+          "response": [
+            {
+              "subject_id": 1,
+              "subject_code": "SUB001",
+              "subject_name": "Fundamentos de Soldadura Terrestre",
+              "credits": 4,
+              "is_eligible": true,
+              "prerequisites_met": [],
+              "prerequisites_missing": [],
+              "prerequisite_names_missing": [],
+              "can_enroll": true,
+              "reason": null
+            },
+            {
+              "subject_id": 5,
+              "subject_code": "SUB005",
+              "subject_name": "Procesos de Soldadura Húmeda y Seca",
+              "credits": 4,
+              "is_eligible": false,
+              "prerequisites_met": [],
+              "prerequisites_missing": [1],
+              "prerequisite_names_missing": ["Fundamentos de Soldadura Terrestre"],
+              "can_enroll": false,
+              "reason": "Debes aprobar las siguientes materias primero: Fundamentos de Soldadura Terrestre"
+            }
+          ]
+        }
+      ]
+    },
+    "GET /api/v1/students/{student_id}/enrollment-status": {
+      "description": "Estado actual de matrícula del estudiante",
+      "url": "http://localhost:8000/api/v1/students/{student_id}/enrollment-status",
+      "method": "GET",
+      "examples": [
+        {
+          "name": "Ejemplo 1: Estudiante sin bloqueos",
+          "url": "http://localhost:8000/api/v1/students/1/enrollment-status",
+          "curl": "curl http://localhost:8000/api/v1/students/1/enrollment-status",
+          "expected_response": {
+            "student_id": 1,
+            "can_enroll": true,
+            "financial_blocked": false,
+            "financial_debt_amount": null,
+            "financial_message": "Estado financiero válido",
+            "eligible_subjects_count": 15,
+            "current_enrollments_count": 0,
+            "warnings": [],
+            "errors": []
+          }
+        },
+        {
+          "name": "Ejemplo 2: Estudiante con deuda",
+          "url": "http://localhost:8000/api/v1/students/2/enrollment-status",
+          "curl": "curl http://localhost:8000/api/v1/students/2/enrollment-status",
+          "expected_response": {
+            "student_id": 2,
+            "can_enroll": false,
+            "financial_blocked": true,
+            "financial_debt_amount": 150.0,
+            "financial_message": "Tienes una deuda pendiente de $150.00",
+            "eligible_subjects_count": 0,
+            "current_enrollments_count": 0,
+            "warnings": [],
+            "errors": ["Tienes una deuda pendiente de $150.00"]
+          }
+        }
+      ]
+    }
+  },
+  "datos_reales": {
+    "nota": "Estos son ejemplos basados en datos reales. Ajusta los IDs según tu base de datos.",
+    "estudiantes_disponibles": [
+      {
+        "id": 1,
+        "code": "EST00001",
+        "name": "Roxana Cabrero",
+        "program_id": 1,
+        "current_semester": 2
+      },
+      {
+        "id": 2,
+        "code": "EST00002",
+        "name": "Ricardo Lobo",
+        "program_id": 1,
+        "current_semester": 10
+      }
+    ],
+    "periodos_academicos": [
+      {
+        "id": 1,
+        "code": "2025-1",
+        "name": "Febrero - Mayo 2025",
+        "status": "active"
+      }
+    ],
+    "secciones_disponibles": [
+      {
+        "id": 1,
+        "section_number": 1,
+        "subject_id": 1,
+        "subject_name": "Fundamentos de Soldadura Terrestre",
+        "capacity": 30,
+        "enrolled_count": 0
+      },
+      {
+        "id": 2,
+        "section_number": 1,
+        "subject_id": 2,
+        "subject_name": "Física Aplicada a la Soldadura Subacuática",
+        "capacity": 25,
+        "enrolled_count": 0
+      }
+    ]
+  },
+  "comandos_curl": {
+    "validar_matricula": "curl -X POST http://localhost:8000/api/v1/enrollment/validate -H 'Content-Type: application/json' -d '{\"student_id\": 1, \"academic_period_id\": 1, \"section_ids\": [1, 2, 3, 4, 5]}'",
+    "materias_elegibles": "curl http://localhost:8000/api/v1/students/1/eligible-subjects",
+    "estado_matricula": "curl http://localhost:8000/api/v1/students/1/enrollment-status"
+  },
+  "comandos_con_formato_json": {
+    "validar_matricula": "curl -X POST http://localhost:8000/api/v1/enrollment/validate -H 'Content-Type: application/json' -d '{\"student_id\": 1, \"academic_period_id\": 1, \"section_ids\": [1, 2, 3, 4, 5]}' | python -m json.tool",
+    "materias_elegibles": "curl http://localhost:8000/api/v1/students/1/eligible-subjects | python -m json.tool",
+    "estado_matricula": "curl http://localhost:8000/api/v1/students/1/enrollment-status | python -m json.tool"
+  }
+}
+

@@ -1,0 +1,141 @@
+{
+  "casos_de_error": {
+    "1_estudiante_inexistente": {
+      "description": "Estudiante que no existe en la base de datos",
+      "request": {
+        "student_id": 99999,
+        "academic_period_id": 1,
+        "section_ids": [1, 2]
+      },
+      "expected_error": "404 - Estudiante no encontrado",
+      "curl": "curl -X POST http://localhost:8000/api/v1/enrollment/validate -H 'Content-Type: application/json' -d '{\"student_id\": 99999, \"academic_period_id\": 1, \"section_ids\": [1, 2]}'"
+    },
+    "2_secciones_inexistentes": {
+      "description": "Secciones que no existen en la base de datos",
+      "request": {
+        "student_id": 1,
+        "academic_period_id": 1,
+        "section_ids": [99999, 99998]
+      },
+      "expected_error": "No se encontraron secciones válidas",
+      "curl": "curl -X POST http://localhost:8000/api/v1/enrollment/validate -H 'Content-Type: application/json' -d '{\"student_id\": 1, \"academic_period_id\": 1, \"section_ids\": [99999, 99998]}'"
+    },
+    "3_periodo_inexistente": {
+      "description": "Período académico que no existe",
+      "request": {
+        "student_id": 1,
+        "academic_period_id": 99999,
+        "section_ids": [1, 2]
+      },
+      "expected_error": "Período académico no encontrado",
+      "curl": "curl -X POST http://localhost:8000/api/v1/enrollment/validate -H 'Content-Type: application/json' -d '{\"student_id\": 1, \"academic_period_id\": 99999, \"section_ids\": [1, 2]}'"
+    },
+    "4_lista_vacia_secciones": {
+      "description": "Lista vacía de secciones",
+      "request": {
+        "student_id": 1,
+        "academic_period_id": 1,
+        "section_ids": []
+      },
+      "expected_error": "No se seleccionaron asignaturas o No se encontraron secciones válidas",
+      "curl": "curl -X POST http://localhost:8000/api/v1/enrollment/validate -H 'Content-Type: application/json' -d '{\"student_id\": 1, \"academic_period_id\": 1, \"section_ids\": []}'"
+    },
+    "5_asignaturas_inexistentes_en_creditos": {
+      "description": "IDs de asignaturas que no existen (cuando se calculan créditos)",
+      "note": "Este caso se maneja cuando las secciones existen pero sus subject_id no",
+      "request": {
+        "student_id": 1,
+        "academic_period_id": 1,
+        "section_ids": [1]
+      },
+      "expected_behavior": "Debería funcionar si la sección 1 existe"
+    },
+    "6_estudiante_sin_historial": {
+      "description": "Estudiante sin historial académico (nuevo estudiante)",
+      "request": {
+        "student_id": 1,
+        "academic_period_id": 1,
+        "section_ids": [1, 2]
+      },
+      "expected_behavior": "Debería funcionar, solo no tendrá prerrequisitos aprobados"
+    },
+    "7_estudiante_sin_estado_financiero": {
+      "description": "Estudiante sin registro de estado financiero",
+      "note": "Verificar si esto causa error o se maneja correctamente",
+      "request": {
+        "student_id": 1,
+        "academic_period_id": 1,
+        "section_ids": [1, 2]
+      }
+    },
+    "8_secciones_de_diferentes_periodos": {
+      "description": "Secciones que pertenecen a diferentes períodos",
+      "request": {
+        "student_id": 1,
+        "academic_period_id": 1,
+        "section_ids": [1, 2]
+      },
+      "note": "Las secciones deberían validarse contra el período especificado"
+    },
+    "9_validar_con_seccion_que_no_tiene_horarios": {
+      "description": "Sección sin horarios definidos",
+      "request": {
+        "student_id": 1,
+        "academic_period_id": 1,
+        "section_ids": [1]
+      },
+      "expected_behavior": "No debería detectar choques si no hay horarios"
+    },
+    "10_eligible_subjects_estudiante_inexistente": {
+      "description": "Obtener asignaturas elegibles de estudiante inexistente",
+      "url": "http://localhost:8000/api/v1/students/99999/eligible-subjects",
+      "expected_error": "404 - Estudiante no encontrado",
+      "curl": "curl http://localhost:8000/api/v1/students/99999/eligible-subjects"
+    },
+    "11_enrollment_status_estudiante_inexistente": {
+      "description": "Obtener estado de matrícula de estudiante inexistente",
+      "url": "http://localhost:8000/api/v1/students/99999/enrollment-status",
+      "expected_error": "404 - Estudiante no encontrado",
+      "curl": "curl http://localhost:8000/api/v1/students/99999/enrollment-status"
+    }
+  },
+  "casos_limite": {
+    "1_muchas_secciones": {
+      "description": "Validar con muchas secciones (50+)",
+      "request": {
+        "student_id": 1,
+        "academic_period_id": 1,
+        "section_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+      },
+      "expected_behavior": "Debería validar todas pero probablemente exceda créditos"
+    },
+    "2_secciones_duplicadas": {
+      "description": "Misma sección repetida en la lista",
+      "request": {
+        "student_id": 1,
+        "academic_period_id": 1,
+        "section_ids": [1, 1, 2, 2]
+      },
+      "expected_behavior": "Debería detectar que son las mismas secciones"
+    },
+    "3_creditos_exactos_al_limite": {
+      "description": "Créditos exactamente en el límite máximo",
+      "request": {
+        "student_id": 1,
+        "academic_period_id": 1,
+        "section_ids": [1, 2, 3, 4, 5]
+      },
+      "note": "5 secciones de 4 créditos = 20 créditos (límite máximo)"
+    },
+    "4_creditos_exactos_al_minimo": {
+      "description": "Créditos exactamente en el límite mínimo",
+      "request": {
+        "student_id": 1,
+        "academic_period_id": 1,
+        "section_ids": [1, 2]
+      },
+      "note": "2 secciones de 4 créditos = 8 créditos (límite mínimo)"
+    }
+  }
+}
+

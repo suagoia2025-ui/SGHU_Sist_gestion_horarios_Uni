@@ -24,6 +24,13 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = "INFO"
     
+    # Schedule Solver
+    SCHEDULE_SOLVER_TIMEOUT: float = 30.0  # Timeout en segundos para el solver de horarios
+    
+    # API Limits
+    MAX_SECTIONS_PER_QUERY: int = 1000  # Límite máximo de secciones por consulta
+    MAX_SUBJECTS_PER_QUERY: int = 100   # Límite máximo de asignaturas por consulta
+    
     class Config:
         env_file = ".env"
         case_sensitive = True

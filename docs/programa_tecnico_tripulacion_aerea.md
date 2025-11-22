@@ -155,7 +155,4 @@ El programa prepara a los estudiantes para obtener:
 
 ---
 
-*Documento creado el [fecha]*
-
-*Última actualización: [fecha]*
 

@@ -119,3 +119,34 @@ class GeneratedScheduleRead(BaseModel):
     class Config:
         from_attributes = True
 
+
+class ScheduleGenerationRequest(BaseModel):
+    """Petición para generar horario"""
+    student_id: int
+    selected_subject_ids: List[int]
+    academic_period_id: Optional[int] = None
+
+
+class UnassignedSubjectInfo(BaseModel):
+    """Información sobre asignatura no asignada"""
+    subject_id: int
+    subject_code: str
+    subject_name: str
+    reason: str
+    conflicting_sections: List[dict]
+
+
+class ScheduleSolutionResponse(BaseModel):
+    """Respuesta de generación de horario"""
+    student_id: int
+    is_feasible: bool
+    assigned_section_ids: List[int]
+    assigned_subject_ids: List[int]
+    unassigned_subjects: List[UnassignedSubjectInfo]
+    processing_time: float
+    conflicts: List[str]
+    solver_status: str
+
+    class Config:
+        from_attributes = True
+

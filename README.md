@@ -5,13 +5,13 @@ Sistema para gestionar la matrícula y generación automática de horarios en un
 ## 🎯 Características Principales
 
 - ✅ Gestión completa del proceso de matrícula
-- 🤖 Generación automática de horarios optimizados
-- 🔄 Procesamiento asíncrono con Celery
-- 📊 Validación exhaustiva de reglas académicas
-- 🎨 Motor híbrido de optimización (OR-Tools + DEAP)
-- 📡 API REST completa con FastAPI
-- 🗄️ PostgreSQL para persistencia
-- 🔧 Simulación de integraciones (Odoo, Moodle)
+- 🤖 Generación automática de horarios optimizados (FASE 5-6)
+- 🔄 Procesamiento asíncrono con Celery (FASE 7)
+- 📊 Validación exhaustiva de reglas académicas ✅ **COMPLETADO**
+- 🎨 Motor híbrido de optimización (OR-Tools + DEAP) (FASE 5-6)
+- 📡 API REST completa con FastAPI ✅ **COMPLETADO**
+- 🗄️ PostgreSQL para persistencia ✅ **COMPLETADO**
+- 🔧 Simulación de integraciones (Odoo, Moodle) ✅ **COMPLETADO**
 
 ## 🏗️ Arquitectura
 ```
@@ -112,15 +112,51 @@ El servidor estará disponible en:
 - **Health Check**: http://localhost:8000/health
 - **DB Health Check**: http://localhost:8000/api/v1/health/db
 
+### Endpoints Disponibles
+
+#### Estudiantes
+- `GET /api/v1/students` - Lista estudiantes
+- `GET /api/v1/students/{id}` - Obtener estudiante
+- `GET /api/v1/students/{id}/academic-history` - Historial académico
+- `GET /api/v1/students/{id}/financial-status` - Estado financiero
+- `GET /api/v1/students/{id}/eligible-subjects` - Asignaturas elegibles
+- `GET /api/v1/students/{id}/enrollment-status` - Estado de matrícula
+
+#### Asignaturas y Programas
+- `GET /api/v1/programs` - Lista programas
+- `GET /api/v1/subjects` - Lista asignaturas
+- `GET /api/v1/course-sections` - Lista secciones
+- `GET /api/v1/academic-periods/current` - Período activo
+
+#### Validación de Matrícula
+- `POST /api/v1/enrollment/validate` - Validar solicitud de matrícula
+  ```json
+  {
+    "student_id": 1,
+    "academic_period_id": 1,
+    "section_ids": [1, 2, 3, 4, 5]
+  }
+  ```
+
+Ver [Ejemplos de Validación](backend/scripts/EJEMPLOS_VALIDACION.md) para más detalles.
+
 ### 8. Probar la API
 ```bash
-# Ejecutar script de pruebas
+# Ejecutar script de pruebas básicas
 python scripts/test_api.py
+
+# Ejecutar script de pruebas de validación
+./scripts/test_validaciones.sh
 
 # O probar manualmente con curl
 curl http://localhost:8000/health
 curl http://localhost:8000/api/v1/students?limit=5
 curl http://localhost:8000/api/v1/programs
+
+# Probar validación de matrícula
+curl -X POST http://localhost:8000/api/v1/enrollment/validate \
+  -H "Content-Type: application/json" \
+  -d '{"student_id": 1, "academic_period_id": 1, "section_ids": [1, 2, 3]}' | python3 -m json.tool
 ```
 
 ### 9. Iniciar workers (en otra terminal - FASE 7)
@@ -130,13 +166,17 @@ celery -A app.core.celery_app worker --loglevel=info
 
 ## 📚 Documentación
 
-- [Arquitectura del Sistema](docs/arquitectura.md)
-- [Motor de Horarios](docs/motor-horarios.md)
-- [Workers Asíncronos](docs/workers-asincrono.md)
-- [Reglas de Negocio](docs/reglas-negocio.md)
-- [API Reference](http://localhost:8000/docs) (Swagger)
+- [Plan de Trabajo](docs/plan_trabajo.md) - Fases del proyecto
+- [Fase 1: Base de Datos](docs/fase1-base-datos.md) ✅ Completada
+- [Reglas de Negocio](docs/reglas-negocio.md) ✅ Completada
+- [API Reference](http://localhost:8000/docs) (Swagger) ✅ Disponible
+- [Ejemplos de Validación](backend/scripts/EJEMPLOS_VALIDACION.md) ✅ Disponible
+- [Motor de Horarios](docs/motor-horarios.md) (FASE 5-6)
+- [Workers Asíncronos](docs/workers-asincrono.md) (FASE 7)
 
 ## 🧪 Testing
+
+### Tests Automatizados (FASE 8 - Pendiente)
 ```bash
 # Ejecutar todos los tests
 pytest
@@ -151,7 +191,42 @@ pytest tests/unit/
 pytest tests/integration/
 ```
 
-## 📊 Simulaciones
+### Pruebas Manuales Disponibles
+```bash
+# Probar endpoints básicos
+python scripts/test_api.py
+
+# Probar validaciones
+./scripts/test_validaciones.sh
+
+# Ver ejemplos de uso
+cat backend/scripts/EJEMPLOS_VALIDACION.md
+```
+
+## 📊 Simulaciones y Scripts
+
+### Scripts de Datos
+```bash
+# Poblar base de datos con datos simulados
+python scripts/populate_db.py
+
+# Ver tablas y datos
+python scripts/view_tables.py
+
+# Limpiar base de datos
+python scripts/reset_db.py
+```
+
+### Scripts de Pruebas
+```bash
+# Probar endpoints básicos
+python scripts/test_api.py
+
+# Probar endpoints de validación
+./scripts/test_validaciones.sh
+```
+
+### Simulaciones (FASE 9 - Futuro)
 ```bash
 # Simular flujo de un estudiante
 python scripts/simulate_student_flow.py --student-id 1
@@ -159,7 +234,7 @@ python scripts/simulate_student_flow.py --student-id 1
 # Simular matrícula masiva
 python scripts/simulate_mass_enrollment.py --students 100 --workers 10
 
-### Analizar resultados
+# Analizar resultados
 python scripts/analyze_simulation_results.py mass_enrollment_results.json
 ```
 
@@ -180,14 +255,34 @@ python scripts/analyze_simulation_results.py mass_enrollment_results.json
 - Pytest
 - HTTPx
 
-## 📈 Performance
+## 📈 Estado del Proyecto
 
-| Métrica | Valor |
-|---------|-------|
-| Generación CP-SAT | < 2s |
-| Optimización AG | < 10s |
-| Throughput | > 5 estudiantes/s |
-| Coverage | > 80% |
+### ✅ Fases Completadas
+
+- **FASE 0:** Setup del Proyecto ✅
+- **FASE 1:** Diseño de Base de Datos ✅
+- **FASE 2:** Scripts de Simulación ✅
+- **FASE 3:** Estructura FastAPI Base ✅
+- **FASE 4:** Lógica de Validación ✅
+
+### 🚧 Fases Pendientes
+
+- **FASE 5:** Motor de Horarios - Parte 1 (Restricciones Duras)
+- **FASE 6:** Motor de Horarios - Parte 2 (Optimización)
+- **FASE 7:** Workers Asíncronos
+- **FASE 8:** Testing y Refinamiento
+- **FASE 9:** Simulador Frontend
+
+### 📊 Métricas Objetivo
+
+| Métrica | Objetivo | Estado |
+|---------|----------|--------|
+| Generación CP-SAT | < 2s | Pendiente |
+| Optimización AG | < 10s | Pendiente |
+| Throughput | > 5 estudiantes/s | Pendiente |
+| Coverage | > 80% | Pendiente |
+| Validaciones implementadas | 6/6 | ✅ 100% |
+| Endpoints de validación | 3/3 | ✅ 100% |
 
 ## 🤝 Contribuir
 

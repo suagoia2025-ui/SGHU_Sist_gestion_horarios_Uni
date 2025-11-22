@@ -171,10 +171,7 @@ sghu/
 
 - [ ] Generar 5 programas académicos
   - Técnico Superior en Logística Internacional, Técnico Superior en Mecánica de Equipo Pesado, Técnico Superior en Soldadura Subacuática, Técnico Superior en Asistencia de Tripulación Aérea y Técnico Superior en Topografía.
-- [ ] Generar 100+ asignaturas coherentes
-  - Distribuidas por programa
-  - Con créditos realistas (1-4 créditos)
-  - Nombres coherentes por área
+- [ ] Buscar los archivos en /Users/ricardo_suarez1983/SGHU_Sist_gestion_horarios_Uni/docs
 - [ ] Crear red de prerrequisitos lógica
   - Asignaturas básicas → intermedias → avanzadas
   - Respetar secuencialidad (Cálculo I → Cálculo II)
@@ -185,8 +182,8 @@ sghu/
   - Diferentes capacidades (20-200 personas)
   - Tipos variados (aulas, laboratorios, auditorios)
 - [ ] Configurar reglas académicas
-  - Límite de créditos por semestre (12-20)
-  - Mínimo de créditos para inscribirse (6)
+  - Límite de créditos por semestre (4-20)
+  - Mínimo de créditos para inscribirse (8)
 
 ### 2.2 Script Simulador de Estudiantes
 **Archivo:** `scripts/simulate_students.py`
