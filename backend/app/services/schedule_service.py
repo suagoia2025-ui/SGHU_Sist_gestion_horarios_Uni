@@ -11,6 +11,7 @@ from app.models.source.offer import CourseSection, SectionSchedule
 from app.models.sghu.enrollment import StudentEnrollment, EnrollmentPeriod
 from app.models.sghu.schedule import GeneratedSchedule, ScheduleSlot
 from app.services.schedule_engine.models import Student, Section, TimeSlot
+from app.services.schedule_engine.fitness import ScheduleFitness
 from app.services.schedule_engine.constraint_solver import ConstraintScheduleSolver
 from app.services.schedule_engine.hybrid_engine import HybridScheduleEngine
 from app.services.schedule_engine.solution import ScheduleSolution
@@ -118,7 +119,6 @@ class ScheduleService:
                 # Calcular quality_score si no está
                 if solution.quality_score is None:
                     assigned_sections = [s for s in filtered_sections if s.id in solution.assigned_section_ids]
-                    from app.services.schedule_engine.fitness import ScheduleFitness
                     fitness_calc = ScheduleFitness(assigned_sections)
                     solution.quality_score = fitness_calc.calculate_fitness()
         else:
@@ -147,8 +147,7 @@ class ScheduleService:
                     solution.schedule_id = saved_schedule.id
             except Exception as e:
                 # Log el error pero no fallar la generación
-                import logging
-                logger = logging.getLogger(__name__)
+                from app.core.logging import logger
                 logger.error(f"Error persistiendo horario: {str(e)}")
                 # Continuar sin persistir si hay error
         
